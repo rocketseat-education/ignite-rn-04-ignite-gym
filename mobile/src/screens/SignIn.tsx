@@ -27,8 +27,8 @@ export function SignIn() {
     navigation.navigate('signUp');
   }
 
-  function handleSignIn({ email, password }: FormData){
-    singIn(email, password);
+  async function handleSignIn({ email, password }: FormData){
+    await singIn(email, password);
   }
 
   return (
