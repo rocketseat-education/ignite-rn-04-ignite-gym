@@ -12,6 +12,7 @@ import { AppError } from '@utils/AppError';
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
+import { useState } from 'react';
 
 type FormData = {
   email: string;
@@ -19,11 +20,11 @@ type FormData = {
 }
 
 export function SignIn() {
+  const [isLoading, setIsLoading] = useState(false)
+
   const { singIn } = useAuth();
-
-  const toas = useToast();
-
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+  const toas = useToast();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>()
 
@@ -33,7 +34,9 @@ export function SignIn() {
 
   async function handleSignIn({ email, password }: FormData) {
     try {
+      setIsLoading(true);
       await singIn(email, password);
+
     } catch (error) {
       const isAppError = error instanceof AppError;
  
@@ -44,6 +47,7 @@ export function SignIn() {
         placement: 'top',
         bgColor: 'red.500'
       })
+      setIsLoading(false);
     }
   }
 
@@ -100,7 +104,11 @@ export function SignIn() {
             )}
           />
 
-          <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
+          <Button 
+            title="Acessar" 
+            onPress={handleSubmit(handleSignIn)} 
+            isLoading={isLoading}
+          />
         </Center>
 
         <Center mt={24}>
