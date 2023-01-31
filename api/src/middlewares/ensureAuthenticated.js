@@ -9,7 +9,6 @@ async function ensureAuthenticated(request, response, next) {
     throw new AppError("JWT token não informado", 401);
   }
 
-
   const [, token] = authHeader.split(" ");
 
   try {
@@ -22,7 +21,7 @@ async function ensureAuthenticated(request, response, next) {
 
     return next();
   } catch {
-    throw new AppError("token.expired", 401);
+    throw new AppError("token.invalid", 401);
   }
 }
 
