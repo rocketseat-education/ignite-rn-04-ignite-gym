@@ -19,6 +19,7 @@ const api = axios.create({
 }) as APIInstanceProps;
 
 let failedQueued: Array<PromiseType> = [];
+let isRefreshing = false;
 
 api.registerInterceptTokenManager = singOut => {
   const interceptTokenManager = api.interceptors.response.use((response) => response, async (requestError) => {
@@ -31,6 +32,24 @@ api.registerInterceptTokenManager = singOut => {
           return Promise.reject(requestError)
         }
         
+        const originalRequestConfig = requestError.config;
+
+        if(isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueued.push({
+              onSuccess: (token: string) => { 
+                originalRequestConfig.headers = { 'Authorization': `Bearer ${token}` };
+                resolve(api(originalRequestConfig));
+              },
+              onFailure: (error: AxiosError) => {
+                reject(error)
+              },
+            })
+          })
+        }
+
+        isRefreshing = true
+
       }
       
       singOut();
